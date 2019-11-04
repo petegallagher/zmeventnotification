@@ -6,17 +6,21 @@ RUN apt update \
     && apt upgrade --assume-yes
 
 # Install pre-reqs
-RUN apt install --assume-yes --no-install-recommends make gcc git wget libyaml-perl libjson-perl python3-pip libc6-dev
+RUN apt install --assume-yes --no-install-recommends git wget \
+        make gcc libyaml-perl libjson-perl libc6-dev \
+        python3-dev python3-pip python3-setuptools 
 RUN perl -MCPAN -e "install Crypt::MySQL" \
 	&& perl -MCPAN -e "install Config::IniFiles" \
 	&& perl -MCPAN -e "install Crypt::Eksblowfish::Bcrypt" \
 	&& perl -MCPAN -e "install Net::WebSocket::Server" \
 	&& perl -MCPAN -e "install LWP::Protocol::https" \
 	&& perl -MCPAN -e "install Net::MQTT::Simple"
+RUN pip3 install wheel
 
-# Install zoneminder
-RUN git clone https://github.com/pliablepixels/zmeventnotification.git /opt/zmeventnotification \
-    && cd /opt/zmeventnotification \
+# Install zmeventnotification
+RUN mkdir /opt/zmeventnotification
+COPY . /opt/zmeventnotification/
+RUN cd /opt/zmeventnotification \
 	&& /opt/zmeventnotification/install.sh --no-interactive --install-es --install-hook --install-config
 
 # Setup Volumes
